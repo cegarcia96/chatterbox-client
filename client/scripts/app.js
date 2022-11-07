@@ -1,11 +1,6 @@
-// This App object represents the Chatterbox application.
-// It should initialize the other parts of the application
-// and begin making requests to the Parse API for data.
-
-var App = {
+const App = {
 
   $spinner: $('.spinner img'),
-
   username: 'anonymous',
 
   initialize: function() {
@@ -14,22 +9,18 @@ var App = {
     FormView.initialize();
     RoomsView.initialize();
     MessagesView.initialize();
-
-    // Fetch initial batch of messages
     App.startSpinner();
     App.fetch(App.stopSpinner);
 
-    // TODO: Make sure the app loads data from the API
-    // continually, instead of just once at the start.
+    setInterval(App.fetch, 3000);
   },
 
   fetch: function(callback = ()=>{}) {
     Parse.readAll((data) => {
-      // examine the response from the server request:
-      console.log(data);
-
-      // TODO: Use the data to update Messages and Rooms
-      // and re-render the corresponding views.
+      Messages.updateMessages(data);
+      RoomsView.render();
+      MessagesView.render();
+      callback();
     });
   },
 

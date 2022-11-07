@@ -1,13 +1,52 @@
-// This object houses all the message _data_ for the app.
-// Treat it like a data structure - add methods to interact
-// with and manipulate the data.
+const Messages = {
 
-var Messages = {
+  _data: [],
+  _latestData: 0,
 
-  // TODO: Define how you want to store your messages.
-  _data: null,
+  sort: (newData) => {
+    Messages._data = Messages._data.concat(newData.reduce((acc, message) => {
+      if (!message.text || message.text.length <= 0) {
+        return acc;
+      }
+      message.roomname = message.roomname.toLowerCase();
+      Messages.compare(message);
+      Rooms.add(message.roomname);
+      return acc.push(message) && acc;
+    }, []));
+  },
 
-  // TODO: Define methods which allow you to retrieve from,
-  // add to, and generally interact with the messages.
+  updateMessages: (data) => {
+    if (Messages._latestData === 0) {
+      Messages.sort(data);
+      return;
+    }
+    for (let i = 0; i < data.length; i++) {
+      if (data[i]['message_id'] === Messages._latestData) {
+        Messages.sort(data.slice(0, i));
+        return;
+      }
+    }
+  },
+
+  compare: (message) => {
+    if (!message.roomname || !message.roomname[0]) {
+      message.roomname = 'lobby';
+    }
+    if (!message.username || !message.username[0]) {
+      message.username = 'anonymous';
+    }
+    if (Messages._latestData < message['message_id']) {
+      Messages._latestData = message['message_id'];
+      Rooms._latestData = message['message_id'];
+    }
+  },
+
+  retrieve: () => {
+    return Messages._data;
+  },
+
+  checkLatest: (messageID) => {
+    return Messages._latestData < messageID;
+  }
 
 };
